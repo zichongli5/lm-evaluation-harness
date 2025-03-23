@@ -200,7 +200,7 @@ def get_unnormalized_answer(text: str) -> str:
     end_seq = "I hope it is correct."
     text += end_seq
     match = re.search(
-        r"Final Answer: The final answer is(.*?). I hope it is correct.",
+        r"The final answer is(.*?).",
         text,
     )
     if match:

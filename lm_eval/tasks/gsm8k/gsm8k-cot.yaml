@@ -61,6 +61,7 @@ generation_kwargs:
   - 'Q:'
   - </s>
   - <|im_end|>
+  - <|end|>
 tag:
 - chain_of_thought
 metadata:

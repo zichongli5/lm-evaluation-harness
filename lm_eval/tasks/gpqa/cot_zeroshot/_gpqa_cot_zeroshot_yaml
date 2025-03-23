@@ -7,6 +7,7 @@ training_split: train
 validation_split: train
 test_split: null
 doc_to_text: "What is the correct answer to this question:{{Question}}\nChoices:\n(A) {{choice1}}\n(B) {{choice2}}\n(C) {{choice3}}\n(D) {{choice4}}\nLet's think step by step: "
+# doc_to_text: "What is the correct answer to this question:{{Question}}\nChoices:\n(A) {{choice1}}\n(B) {{choice2}}\n(C) {{choice3}}\n(D) {{choice4}}\nYour response should end with \"The answer is (the_answer_letter)\" where the (the_answer_letter) is one of (A), (B), (C) or (D). Let's think step by step: "
 doc_to_target: answer
 filter_list:
   - name: "strict-match"
