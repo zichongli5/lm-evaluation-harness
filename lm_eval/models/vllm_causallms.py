@@ -132,7 +132,11 @@ class VLLM(TemplateLM):
             eval_logger.info(
                 "Found 'gemma' in model name, a BOS token will be used as Gemma series models underperform without it."
             )
-
+        if "gemma-2" in pretrained.lower():
+            self.tokenizer.chat_template = "{{ bos_token }}{% for message in messages %}{% if message['role'] == 'system' %}{% continue %}{% endif %}{% if (message['role'] == 'user') != (loop.index0 % 2 == 0) %}{{ raise_exception('Conversation roles must alternate user/assistant/user/assistant/...') }}{% endif %}{% set role = 'model' if message['role'] == 'assistant' else message['role'] %}{{ '<start_of_turn>' + role + '\n' + message['content'] | trim + '<end_of_turn>\n' }}{% endfor %}{% if add_generation_prompt %}{{ '<start_of_turn>model\n' }}{% endif %}"
+            eval_logger.info(
+                "Found 'gemma-2' in model name, a custom chat template will be used for this model to avoid error."
+            )
         self.custom_prefix_token_id = prefix_token_id
         if prefix_token_id is not None:
             eval_logger.info(
