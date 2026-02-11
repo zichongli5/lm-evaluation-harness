@@ -29,6 +29,8 @@ except (ModuleNotFoundError, AssertionError) as e:
 def doc_to_text(doc: dict) -> str:
     return "Problem:" + "\n" + doc["problem"] + "\n\n" + "Solution:"
 
+def doc_to_text_chat(doc: dict) -> str:
+    return f"Solve the following question, and put your final answer within \\boxed{{}}: {doc['problem']}"
 
 def process_docs(dataset: datasets.Dataset) -> datasets.Dataset:
     def _process_doc(doc: dict) -> dict:
