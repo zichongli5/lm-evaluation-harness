@@ -18,6 +18,7 @@ from packaging.version import parse as parse_version
 from tqdm import tqdm
 from vllm import LLM, SamplingParams, TokensPrompt
 from vllm.lora.request import LoRARequest
+from vllm.config.compilation import CompilationConfig, CUDAGraphMode
 
 from lm_eval.api.model import TemplateLM
 from lm_eval.api.registry import register_model
@@ -193,6 +194,7 @@ class VLLM(TemplateLM):
             "seed": int(seed),
             "enable_lora": bool(lora_local_path),
             "max_lora_rank": int(max_lora_rank),
+            "compilation_config": CompilationConfig(cudagraph_mode=CUDAGraphMode.PIECEWISE)
         }
         self.model_args.update(kwargs)
         self.batch_size = (
