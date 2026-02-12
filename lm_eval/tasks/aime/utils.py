@@ -1,12 +1,48 @@
 from functools import lru_cache
+import os
 from pathlib import Path
-from typing import Dict, List
+import re
+from typing import Dict, List, Optional
 
 
-@lru_cache(maxsize=1)
-def _load_gemini_aime_meta_prompt() -> str:
+def _get_meta_question_limit() -> Optional[int]:
+    raw_limit = os.getenv("AIME_GEMINI_META_NUM_QUESTIONS")
+    if raw_limit is None or raw_limit.strip() == "":
+        return None
+    try:
+        limit = int(raw_limit)
+    except ValueError as exc:
+        raise ValueError(
+            f"AIME_GEMINI_META_NUM_QUESTIONS must be an integer, got: {raw_limit}"
+        ) from exc
+    if limit < 0:
+        raise ValueError(
+            f"AIME_GEMINI_META_NUM_QUESTIONS must be >= 0, got: {raw_limit}"
+        )
+    return limit
+
+
+def _slice_meta_prompt_by_questions(prompt: str, limit: Optional[int]) -> str:
+    if limit is None:
+        return prompt
+    if limit == 0:
+        return ""
+
+    start_indices = [match.start() for match in re.finditer(r"(?m)^Question:", prompt)]
+    if not start_indices:
+        return prompt
+
+    if limit >= len(start_indices):
+        return prompt
+
+    return prompt[: start_indices[limit]].strip()
+
+
+@lru_cache(maxsize=None)
+def _load_gemini_aime_meta_prompt(limit: Optional[int]) -> str:
     prompt_path = Path(__file__).resolve().parent / "gemini_aime_meta_filtered.txt"
-    return prompt_path.read_text(encoding="utf-8").strip()
+    prompt = prompt_path.read_text(encoding="utf-8").strip()
+    return _slice_meta_prompt_by_questions(prompt, limit)
 
 
 def _extract_aime_question(doc: dict) -> str:
@@ -18,22 +54,37 @@ def _extract_aime_question(doc: dict) -> str:
 
 def doc_to_text_with_gemini_meta(doc: dict) -> str:
     question = _extract_aime_question(doc)
-    return f"{_load_gemini_aime_meta_prompt()}\n\nQuestion: {question}\nAnswer:"
+    meta_prompt = _load_gemini_aime_meta_prompt(_get_meta_question_limit())
+    if meta_prompt:
+        return f"{meta_prompt}\n\nQuestion: {question}\nAnswer:"
+    return f"Question: {question}\nAnswer:"
 
 
 def doc_to_text_with_gemini_meta_boxed(doc: dict) -> str:
     question = _extract_aime_question(doc)
-    return (
+    meta_prompt = _load_gemini_aime_meta_prompt(_get_meta_question_limit())
+    context = (
         "Below are some math questions and solutions. I'll give you a new question at the end.\n"
-        f"{_load_gemini_aime_meta_prompt()}\n\n"
+    )
+    if meta_prompt:
+        context += f"{meta_prompt}\n\n"
+    else:
+        context += "\n"
+    return context + (
         f"Solve the following question, and put your final answer within \\boxed{{}}: {question}"
     )
 
 def doc_to_text_with_gemini_meta_boxed2(doc: dict) -> str:
     question = _extract_aime_question(doc)
-    return (
+    meta_prompt = _load_gemini_aime_meta_prompt(_get_meta_question_limit())
+    context = (
         "Below are some math questions and solutions. I'll give you a new question at the end.\n"
-        f"{_load_gemini_aime_meta_prompt()}\n\n"
+    )
+    if meta_prompt:
+        context += f"{meta_prompt}\n\n"
+    else:
+        context += "\n"
+    return context + (
         f"Given the above example questions and solutions, solve the following question, and put your final answer within \\boxed{{}}: {question}"
     )
 

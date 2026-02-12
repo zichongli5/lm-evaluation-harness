@@ -45,6 +45,18 @@
 * `aime24_pass_avg_16_gemini_meta`: AIME 2024 pass@k/avg@k (k up to 16) with the Gemini AIME meta prompt prepended
 * `aime25_gemini_meta`: AIME 2025 exact-match variant with the Gemini AIME meta prompt prepended
 
+### Gemini Meta Prompt Control
+
+For `*_gemini_meta` variants, you can control how many examples from `gemini_aime_meta_filtered.txt` are prepended by setting:
+
+* `AIME_GEMINI_META_NUM_QUESTIONS=<N>`
+
+Behavior:
+
+* unset/empty: include all examples in the txt
+* `0`: include none
+* positive integer `N`: include first `N` `Question:` blocks
+
 ### Checklist
 
 For adding novel benchmarks/datasets to the library:
