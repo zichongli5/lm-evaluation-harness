@@ -194,7 +194,7 @@ class VLLM(TemplateLM):
             "seed": int(seed),
             "enable_lora": bool(lora_local_path),
             "max_lora_rank": int(max_lora_rank),
-            "compilation_config": CompilationConfig(cudagraph_mode=CUDAGraphMode.PIECEWISE)
+            # "compilation_config": CompilationConfig(cudagraph_mode=CUDAGraphMode.PIECEWISE)
         }
         self.model_args.update(kwargs)
         self.batch_size = (
