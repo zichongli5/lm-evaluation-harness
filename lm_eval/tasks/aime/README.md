@@ -42,6 +42,8 @@
 * `aime_pass_avg_32`: AIME 1983-2024 pass@32 and avg@32 variant
 * `aime24_pass_avg_32`: AIME 2024 pass@32 and avg@32 variant
 * `aime25_pass_avg_32`: AIME 2025 pass@32 and avg@32 variant
+* `aime24_pass_avg_16_gemini_meta`: AIME 2024 pass@k/avg@k (k up to 16) with the Gemini AIME meta prompt prepended
+* `aime25_gemini_meta`: AIME 2025 exact-match variant with the Gemini AIME meta prompt prepended
 
 ### Checklist
 

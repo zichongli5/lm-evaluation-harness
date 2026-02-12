@@ -1,4 +1,41 @@
+from functools import lru_cache
+from pathlib import Path
 from typing import Dict, List
+
+
+@lru_cache(maxsize=1)
+def _load_gemini_aime_meta_prompt() -> str:
+    prompt_path = Path(__file__).resolve().parent / "gemini_aime_meta_filtered.txt"
+    return prompt_path.read_text(encoding="utf-8").strip()
+
+
+def _extract_aime_question(doc: dict) -> str:
+    for key in ("Problem", "problem"):
+        if key in doc:
+            return str(doc[key])
+    raise KeyError("Could not find AIME question field. Expected `Problem` or `problem`.")
+
+
+def doc_to_text_with_gemini_meta(doc: dict) -> str:
+    question = _extract_aime_question(doc)
+    return f"{_load_gemini_aime_meta_prompt()}\n\nQuestion: {question}\nAnswer:"
+
+
+def doc_to_text_with_gemini_meta_boxed(doc: dict) -> str:
+    question = _extract_aime_question(doc)
+    return (
+        "Below are some math questions and solutions. I'll give you a new question at the end.\n"
+        f"{_load_gemini_aime_meta_prompt()}\n\n"
+        f"Solve the following question, and put your final answer within \\boxed{{}}: {question}"
+    )
+
+def doc_to_text_with_gemini_meta_boxed2(doc: dict) -> str:
+    question = _extract_aime_question(doc)
+    return (
+        "Below are some math questions and solutions. I'll give you a new question at the end.\n"
+        f"{_load_gemini_aime_meta_prompt()}\n\n"
+        f"Given the above example questions and solutions, solve the following question, and put your final answer within \\boxed{{}}: {question}"
+    )
 
 
 def pass_at_k(references: list[str], predictions: list[list[str]], k: list[int]):
